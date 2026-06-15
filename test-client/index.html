@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client de test — MarchéLocal</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #1a1a1a; }
+    h1 { color: #2B274F; }
+    .etat { padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+    .ok { background: #e7f6ec; color: #1a7f37; }
+    .err { background: #fdeaea; color: #b42318; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; justify-content: space-between; padding: 12px 16px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; }
+    .nom { font-weight: 600; }
+    .cat { color: #888; font-size: 13px; }
+    .prix { color: #2B274F; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Produits MarchéLocal</h1>
+  <div id="etat" class="etat">Chargement…</div>
+  <ul id="liste"></ul>
+
+  <script>
+    const API = 'http://localhost:3000/api/v1/products';
+
+    fetch(API)
+      .then((res) => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then((produits) => {
+        const etat = document.getElementById('etat');
+        etat.className = 'etat ok';
+        etat.textContent = `✓ ${produits.length} produits chargés sans erreur CORS`;
+
+        const liste = document.getElementById('liste');
+        produits.forEach((p) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span>
+              <span class="nom">${p.name}</span>
+              <span class="cat"> · ${p.category}</span>
+            </span>
+            <span class="prix">${p.price} FCFA</span>`;
+          liste.appendChild(li);
+        });
+      })
+      .catch((err) => {
+        const etat = document.getElementById('etat');
+        etat.className = 'etat err';
+        etat.textContent = '✗ Échec : ' + err.message + ' (voir la console)';
+        console.error('Erreur :', err);
+      });
+  </script>
+</body>
+</html>
